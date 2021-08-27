@@ -21,6 +21,10 @@ yargs(hideBin(process.argv))
     addZookeeperOption(yargs)
     addPathPositional(yargs)
   }, importPath)
+  .command('exists [path]', 'exists with error code 0 if it exists, -1 if it doesnt', yargs => {
+    addZookeeperOption(yargs)
+    addPathPositional(yargs)
+  }, existsPath)
   .help()
   .argv
 
@@ -97,6 +101,17 @@ async function importPath({ file, zookeeper }) {
     console.error('Done.')
 
     await close()
+  })
+
+  client.connect()
+}
+
+async function existsPath({ path, zookeeper }) {
+  const client = Zookeeper.createClient(zookeeper)
+
+  client.once('connected', async () => {
+    const exists = util.promisify(client.exists.bind(client))
+    process.exit(await exists(path) ? 0 : 1)
   })
 
   client.connect()
