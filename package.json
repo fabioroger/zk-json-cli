@@ -1,14 +1,18 @@
 {
-  "name": "zookeeper-json-cli",
-  "version": "1.0.0",
+  "name": "zk-json-cli",
+  "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "zk-json-cli": "./bin/zk-json-cli.sh"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-zookeeper-client": "^1.1.1"
+    "node-zookeeper-client": "^1.1.1",
+    "yargs": "^17.1.1"
   }
 }
