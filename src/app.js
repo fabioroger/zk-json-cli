@@ -92,6 +92,7 @@ async function importPath({ file, zookeeper }) {
 
   client.once('connected', async () => {
     const exists = util.promisify(client.exists.bind(client))
+    const mkdirp = util.promisify(client.mkdirp.bind(client))
     const create = util.promisify(client.create.bind(client))
     const setData = util.promisify(client.setData.bind(client))
     const close = util.promisify(client.close.bind(client))
@@ -101,9 +102,11 @@ async function importPath({ file, zookeeper }) {
     console.error('Importing', entries.length, 'entries...')
     for (const [path, value] of entries) {
       if (await exists(path)) {
-        setData(path, getDataFromFile(value), -1)
+        await setData(path, getDataFromFile(value), -1)
       } else {
-        create(path, getDataFromFile(value))
+        const dir = path.substr(0, path.lastIndexOf('/'))
+        await mkdirp(dir)
+        await create(path, getDataFromFile(value))
       }
     }
 
