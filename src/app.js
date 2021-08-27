@@ -64,14 +64,23 @@ function exportPath({ path, zookeeper, file }) {
     const getData = util.promisify(client.getData.bind(client))
     const close = util.promisify(client.close.bind(client))
     const acc = {}
-    const data = await listSubTreeBFS(path)
-    console.error('Exporting', data.length, 'entries...')
-    for await (const next of data) {
-      const data = await getData(next)
-      acc[next] = tryConvertingToHumanReadableData(data)
+    try {
+      const data = await listSubTreeBFS(path)
+      console.error('Exporting', data.length, 'entries...')
+      for await (const next of data) {
+        const data = await getData(next)
+        acc[next] = tryConvertingToHumanReadableData(data)
+      }
+      fs.writeFileSync(file === '-' ? 1 : file, JSON.stringify(acc))
+      console.error('Done.')
+    } catch (e) {
+      if (e.name === 'NO_NODE') {
+        console.error('Node not found:', path)
+      } else {
+        console.error(e.message)
+      }
+      process.exit(-1)
     }
-    fs.writeFileSync(file === '-' ? 1 : file, JSON.stringify(acc))
-    console.error('Done.')
     await close()
   })
 
