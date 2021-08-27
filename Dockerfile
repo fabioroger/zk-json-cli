@@ -1,3 +1,13 @@
 FROM node:lts
 
-RUN npm i -g zk-json-cli
+WORKDIR /app
+
+COPY package.json ./
+COPY package-lock.json ./
+
+RUN npm i
+
+COPY ./src ./src
+COPY ./bin ./bin
+
+RUN npm link
